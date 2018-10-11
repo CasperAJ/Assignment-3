@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Xunit;
 
-namespace Assignment3TestSuite
+namespace Assignment_3
 {
 
     public class Response
