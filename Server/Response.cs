@@ -4,7 +4,15 @@ using System.Text;
 
 namespace Server
 {
-    class Response
+    public class Response
     {
+        public string status;
+        public string body;
+
+        public Response(string status, string body)
+        {
+            this.status = status;
+            this.body = body;
+        }
     }
 }
