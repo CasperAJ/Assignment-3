@@ -22,8 +22,11 @@ namespace Server
                 var buffer = new byte[newClient.ReceiveBufferSize];
 
                 var readClient = stream.Read(buffer, 0, buffer.Length);
-                var clientMsg = JsonConvert.DeserializeObject(readClient);
+                var utf8ClientMsg = Encoding.UTF8.GetString(buffer, 0, readClient);
+                Request clientMsg = JsonConvert.DeserializeObject<Request>(utf8ClientMsg);
 
+
+                Console.WriteLine("Methid: {0}, Path: {1}, DateTime: {2}, Body: {3}", clientMsg.method, clientMsg.path, clientMsg.dateTime, clientMsg.body);
             }
 
 
