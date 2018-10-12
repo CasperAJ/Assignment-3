@@ -1,7 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Server
@@ -17,73 +21,58 @@ namespace Server
             while (true)
             {
                 var newClient = server.AcceptTcpClient();
-                var stream = newClient.GetStream();
+                var t = new Thread(HandleClient);
+                t.Start(newClient);
 
-                var buffer = new byte[newClient.ReceiveBufferSize];
-
-                var readClient = stream.Read(buffer, 0, buffer.Length);
-                var utf8ClientMsg = Encoding.UTF8.GetString(buffer, 0, readClient);
-                Request clientMsg = JsonConvert.DeserializeObject<Request>(utf8ClientMsg);
-
-
-                Console.WriteLine("Methid: {0}, Path: {1}, DateTime: {2}, Body: {3}", clientMsg.method, clientMsg.path, clientMsg.dateTime, clientMsg.body);
+                Task tas = Task.Factory.StartNew(() => HandleClient(newClient));
+//                var stream = newClient.GetStream();
+//
+//                var buffer = new byte[newClient.ReceiveBufferSize];
+//
+//                var readClient = stream.Read(buffer, 0, buffer.Length);
+//                var utf8ClientMsg = Encoding.UTF8.GetString(buffer, 0, readClient);
+//                RawDataJTP RWJTP = new RawDataJTP();
+//                var clientRequest = RWJTP.RWJTP_Request(utf8ClientMsg);
+//
+//
+//                Console.WriteLine("Method: {0}, Path: {1}, DateTime: {2}, Body: {3}", clientRequest.method, clientRequest.path, clientRequest.dateTime, clientRequest.body);
             }
 
+        }
+
+        public static void HandleClient(object client)
+        {
+
+            Console.WriteLine("New thread created");
+            Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
+            //Thread.Sleep(10000);
+            TcpClient newClient = (TcpClient)client;
+            var stream = newClient.GetStream();
+
+            //TcpClient Nclient = (TcpClient)client;
+
+            //sets two streams
+            //StreamWriter sWriter = new StreamWriter(Nclient.GetStream(), Encoding.ASCII);
+            //StreamReader sReader = new StreamReader(Nclient.GetStream(), Encoding.ASCII);
+
+            //Console.WriteLine("client" + sReader.ReadLine());
+            //var sReader = new StreamReader(newClient.GetStream());
+
+            var buffer = new byte[newClient.ReceiveBufferSize];
+
+            var readClient = stream.Read(buffer, 0, buffer.Length);
+            var utf8ClientMsg = Encoding.UTF8.GetString(buffer, 0, readClient);
+            RawDataJTP RWJTP = new RawDataJTP();
+            //var clientRequest = RWJTP.RWJTP_Request(utf8ClientMsg);
+            //Response responseToClient = RWJTP.RWJTP_Response(clientRequest);
 
 
-            /* Echo Server fra lector test
-            var server = new TcpListener(IPAddress.Parse("127.0.0.1"), 5000);
-            server.Start();
-            Console.WriteLine("Server started...");
+            Console.WriteLine();
+            Console.WriteLine("Method: {0}, Path: {1}, DateTime: {2}, Body: {3}", clientRequest.method, clientRequest.path, clientRequest.dateTime, clientRequest.body);
 
-            while (true)
-            {
-                var client = server.AcceptTcpClient();
-
-                var stream = client.GetStream();
-                var buffer = new byte[client.ReceiveBufferSize];
-
-                var readCnt = stream.Read(buffer, 0, buffer.Length);
-                var msg = Encoding.UTF8.GetString(buffer, 0, readCnt);
-
-                Console.WriteLine("Messge: {0}", msg);
-
-                var upMsg = Encoding.UTF8.GetBytes(msg.ToUpper());
-
-                stream.Write(upMsg, 0, upMsg.Length);
-
-                stream.Close();
-                client.Close();
-
-            }
-
-             */
-
-            /* Echo client
-            var client = new TcpClient();
-
-            client.Connect(IPAddress.Parse("127.0.0.1"), 5000);
-
-            var msg = Encoding.UTF8.GetBytes("Hello");
-
-            var stream = client.GetStream();
-
-            stream.Write(msg, 0, msg.Length);
-
-            var buffer = new byte[client.ReceiveBufferSize];
-            //stream.Read(buffer, 0, buffer.Length);
-
-            var readCnt = stream.Read(buffer, 0, buffer.Length);
-
-            var resMsg = Encoding.UTF8.GetString(buffer, 0, readCnt);
-
-            Console.WriteLine("Response: {0}", resMsg);
-
-            stream.Close();
-            client.Close();
-
-
-             */
+            Console.WriteLine("Task completed");
+            
         }
     }
+
 }
