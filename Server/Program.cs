@@ -21,21 +21,25 @@ namespace Server
             while (true)
             {
                 var newClient = server.AcceptTcpClient();
-                var t = new Thread(HandleClient);
-                t.Start(newClient);
 
-                Task tas = Task.Factory.StartNew(() => HandleClient(newClient));
-//                var stream = newClient.GetStream();
-//
-//                var buffer = new byte[newClient.ReceiveBufferSize];
-//
-//                var readClient = stream.Read(buffer, 0, buffer.Length);
-//                var utf8ClientMsg = Encoding.UTF8.GetString(buffer, 0, readClient);
-//                RawDataJTP RWJTP = new RawDataJTP();
-//                var clientRequest = RWJTP.RWJTP_Request(utf8ClientMsg);
-//
-//
-//                Console.WriteLine("Method: {0}, Path: {1}, DateTime: {2}, Body: {3}", clientRequest.method, clientRequest.path, clientRequest.dateTime, clientRequest.body);
+                //Thread t = new Thread(HandleClient);
+                //t.Start(newClient);
+
+                Task.Factory.StartNew(() => HandleClient(newClient));
+                #region Tested unthread code
+                //                var stream = newClient.GetStream();
+                //
+                //                var buffer = new byte[newClient.ReceiveBufferSize];
+                //
+                //                var readClient = stream.Read(buffer, 0, buffer.Length);
+                //                var utf8ClientMsg = Encoding.UTF8.GetString(buffer, 0, readClient);
+                //                RawDataJTP RWJTP = new RawDataJTP();
+                //                var clientRequest = RWJTP.RWJTP_Request(utf8ClientMsg);
+                //
+                //
+                //                Console.WriteLine("Method: {0}, Path: {1}, DateTime: {2}, Body: {3}", clientRequest.method, clientRequest.path, clientRequest.dateTime, clientRequest.body);
+
+                #endregion
             }
 
         }
@@ -45,7 +49,7 @@ namespace Server
 
             Console.WriteLine("New thread created");
             Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
-            //Thread.Sleep(10000);
+            Thread.Sleep(10000);
             TcpClient newClient = (TcpClient)client;
             var stream = newClient.GetStream();
 
@@ -63,14 +67,19 @@ namespace Server
             var readClient = stream.Read(buffer, 0, buffer.Length);
             var utf8ClientMsg = Encoding.UTF8.GetString(buffer, 0, readClient);
             RawDataJTP RWJTP = new RawDataJTP();
-            //var clientRequest = RWJTP.RWJTP_Request(utf8ClientMsg);
-            //Response responseToClient = RWJTP.RWJTP_Response(clientRequest);
+            var clientRequest = RWJTP.RWJTP_Request(utf8ClientMsg);
+            var responseToClient = RWJTP.RWJTP_Response(clientRequest);
 
+            stream.WriteAsync(buffer, 0 ,responseToClient.Length);
 
+            Console.WriteLine(responseToClient);
             Console.WriteLine();
-            Console.WriteLine("Method: {0}, Path: {1}, DateTime: {2}, Body: {3}", clientRequest.method, clientRequest.path, clientRequest.dateTime, clientRequest.body);
+            if (clientRequest.method != String.Empty)
+            {
+                Console.WriteLine("Method: {0}, Path: {1}, DateTime: {2}, Body: {3}", clientRequest.method, clientRequest.path, clientRequest.dateTime, clientRequest.body);
 
-            Console.WriteLine("Task completed");
+            }
+            Console.WriteLine("Task completed " +Thread.CurrentThread.ManagedThreadId);
             
         }
     }

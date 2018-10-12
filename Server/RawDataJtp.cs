@@ -9,19 +9,19 @@ namespace Server
     {
         public Request RWJTP_Request(string clientRequest)
         {
-            //Request requestObj = JsonConvert.DeserializeObject<Request>(clientRequest);
+            Request requestObj = JsonConvert.DeserializeObject<Request>(clientRequest);
 
-            //return requestObj;
+            return requestObj;
         }
 
-        //public Response RWJTP_Response(Request requestObj)
-        //{
+        public string RWJTP_Response(Request requestObj)
+        {
 
-        //    Response responseObj = new Response("1:Ok","tester");
+            Response responseObj = new Response("1 Ok", "tester");
 
-        //    var x = JsonConvert.SerializeObject(responseObj);
-        //    return x;
-        //}
+            var x = JsonConvert.SerializeObject(responseObj);
+            return x;
+        }
 
     }
 }
