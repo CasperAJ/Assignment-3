@@ -21,11 +21,14 @@ namespace Server
             while (true)
             {
                 var newClient = server.AcceptTcpClient();
+                if (newClient.Connected)
+                {
+                    Task.Factory.StartNew(() => HandleClient(newClient));
+                }
 
                 //Thread t = new Thread(HandleClient);
                 //t.Start(newClient);
 
-                Task.Factory.StartNew(() => HandleClient(newClient));
                 #region Tested unthread code
                 //                var stream = newClient.GetStream();
                 //
